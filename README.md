@@ -1,5 +1,7 @@
 # Gitea 接口自动化测试框架
 
+[![API Tests](https://github.com/Dongzhi9/gitea-api-test/actions/workflows/test.yml/badge.svg)](https://github.com/Dongzhi9/gitea-api-test/actions/workflows/test.yml)
+
 基于 pytest 对开源项目 Gitea 的 REST API 进行接口自动化测试，覆盖用户、仓库、文件、Issue
 四个业务模块及跨用户权限控制，共 49 条用例。
 
@@ -80,3 +82,14 @@ allure open allure-report
   评论通过 `try/finally` 清理，保证重复执行不留残留数据。
 - **预期以实测为准**：Gitea 不同接口的返回码并不统一（删仓库 204、删文件 200、改 Issue 201），
   所有预期均通过实际调用确认后写入断言，并为每个断言附带状态码与响应体，失败时可直接定位。
+
+## 持续集成
+
+`.github/workflows/test.yml` 在每次 push 和 PR 时自动执行：
+
+1. 用 Docker 拉起一个 Gitea 实例并等待 `/api/v1/version` 就绪
+2. 进入容器创建四个测试账号
+3. 生成 CI 专用的 `config.yaml`
+4. 安装依赖并执行全部 49 条用例
+
+CI 环境不配置访问令牌，四个角色统一走用户名密码认证，因此本地用令牌、CI 用密码两条路径都被覆盖到。
