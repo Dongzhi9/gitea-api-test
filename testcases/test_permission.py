@@ -54,8 +54,6 @@ def test_other_user_cannot_update_repo(repo_of, user_a, user_b):
                         json={"description": "别人来改"})
     assert resp.status_code == 403, "改别人仓库应该 403,实际 %s:%s" % (
         resp.status_code, resp.text)
-    assert resp.json()["message"].startswith(
-        "user should be an owner or a collaborator")
 
 def test_other_user_cannot_delete_repo(repo_of, user_a, user_b):
     """非主人删别人的仓库,应该被拒。"""

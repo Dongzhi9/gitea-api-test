@@ -145,6 +145,7 @@ def test_delete_token(admin, unique):
 def test_invalid_token(cfg):
     """伪造的 token 预测 401。"""
     client = ApiClient("user_a", cfg)
+    client.auth = None          # 去掉用户名密码,否则服务端优先用密码认证
     client.headers = {"Authorization": "token fakefakefake1234567890"}
     resp = client.get("/user")
     assert resp.status_code == 401, "假 token 应该 401,实际 %s:%s" % (
