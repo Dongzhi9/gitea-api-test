@@ -34,10 +34,10 @@ jobs:
 
       - name: Create test users
         run: |
-          docker exec gitea gitea admin user create --username dongzhi --password 'Jj797264508@' --email dongzhi@test.com --admin
-          docker exec gitea gitea admin user create --username user1 --password 'user1123' --email user1@test.com
-          docker exec gitea gitea admin user create --username user2 --password 'user2123' --email user2@test.com
-          docker exec gitea gitea admin user create --username user3 --password 'user3123' --email user3@test.com
+          docker exec -u git gitea gitea admin user create --username dongzhi --password 'Jj797264508@' --email dongzhi@test.com --admin --must-change-password=false
+          docker exec -u git gitea gitea admin user create --username user1 --password 'user1123' --email user1@test.com --must-change-password=false
+          docker exec -u git gitea gitea admin user create --username user2 --password 'user2123' --email user2@test.com --must-change-password=false
+          docker exec -u git gitea gitea admin user create --username user3 --password 'user3123' --email user3@test.com --must-change-password=false
 
       - name: Write config
         run: |
