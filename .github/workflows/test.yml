@@ -1,0 +1,72 @@
+name: API Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start Gitea
+        run: |
+          docker run -d --name gitea -p 3000:3000 \
+            -e GITEA__database__DB_TYPE=sqlite3 \
+            -e GITEA__security__INSTALL_LOCK=true \
+            -e GITEA__server__ROOT_URL=http://localhost:3000/ \
+            -e GITEA__server__HTTP_PORT=3000 \
+            -e GITEA__service__DISABLE_REGISTRATION=true \
+            gitea/gitea:latest
+
+      - name: Wait for Gitea
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf http://127.0.0.1:3000/api/v1/version; then exit 0; fi
+            sleep 2
+          done
+          echo "Gitea 启动超时"
+          docker logs gitea
+          exit 1
+
+      - name: Create test users
+        run: |
+          docker exec gitea gitea admin user create --username dongzhi --password 'Jj797264508@' --email dongzhi@test.com --admin
+          docker exec gitea gitea admin user create --username user1 --password 'user1123' --email user1@test.com
+          docker exec gitea gitea admin user create --username user2 --password 'user2123' --email user2@test.com
+          docker exec gitea gitea admin user create --username user3 --password 'user3123' --email user3@test.com
+
+      - name: Write config
+        run: |
+          cat > config.yaml <<'EOF'
+          base_url: "http://127.0.0.1:3000"
+          api_prefix: "/api/v1"
+          timeout: 10
+
+          roles:
+            admin:
+              username: "dongzhi"
+              password: "Jj797264508@"
+            user_a:
+              username: "user1"
+              password: "user1123"
+            user_b:
+              username: "user2"
+              password: "user2123"
+            user_c:
+              username: "user3"
+              password: "user3123"
+          EOF
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest -q

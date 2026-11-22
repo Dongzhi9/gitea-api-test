@@ -1,0 +1,19 @@
+base_url: "http://127.0.0.1:3000"
+api_prefix: "/api/v1"
+timeout: 10
+
+roles:
+  admin:
+    username: "your-admin"
+    password: "your-password"
+  user_a:
+    username: "user1"
+    password: "your-password"
+    token: "your-token"
+  user_b:
+    username: "user2"
+    password: "your-password"
+  user_c:
+    username: "user3"
+    password: "your-password"
+    token: "your-token"
